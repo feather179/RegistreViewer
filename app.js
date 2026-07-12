@@ -257,6 +257,12 @@ class RegisterViewer {
           cell.appendChild(square);
           cell.addEventListener('mousedown', (event) => this.onBitMouseDown(bitIndex, event));
           cell.addEventListener('mouseenter', () => this.onBitMouseEnter(bitIndex));
+          cell.addEventListener('dblclick', (event) => {
+            this.toggleBit(bitIndex);
+            this.syncInput();
+            this.renderGrid();
+            this.updateSubPanel();
+          });
           cell.addEventListener('keydown', (event) => this.onBitKeyDown(bitIndex, event));
           groupEl.appendChild(cell);
         }
