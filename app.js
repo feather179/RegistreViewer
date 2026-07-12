@@ -145,13 +145,22 @@ class RegisterViewer {
 
     try {
       const newVal = this.parseValue(this.subInput.value);
+
+      const maxVal = (1n << BigInt(this.selectedBits.size)) - 1n;
+      if (newVal > maxVal) {
+        this.setStatus(`Value too large — max ${this.selectedBits.size} bits (0x${maxVal.toString(16).toUpperCase()})`);
+        this.renderGrid();
+        this.updateSubPanel();
+        return;
+      }
+
       this.writeSubValue(newVal);
       this.syncInput();
       this.renderGrid();
       this.updateSubPanel();
       this.setStatus('', false);
     } catch (e) {
-      this.setStatus('Invalid sub-value');
+      // Silently ignore — intermediate typing states are expected
     }
   }
 
@@ -163,13 +172,15 @@ class RegisterViewer {
   parseValue(str) {
     str = str.trim();
     if (!str) return 0n;
+    let val;
     if (str.startsWith('0x') || str.startsWith('0X')) {
-      return BigInt(str);
+      val = BigInt(str);
+    } else if (str.startsWith('0b') || str.startsWith('0B')) {
+      val = BigInt(str);
+    } else {
+      val = BigInt(str);
     }
-    if (str.startsWith('0b') || str.startsWith('0B')) {
-      return BigInt(str);
-    }
-    return BigInt(str);
+    return val & 0xFFFFFFFFFFFFFFFFn;
   }
 
   renderGrid() {
@@ -191,6 +202,8 @@ class RegisterViewer {
           const cell = document.createElement('div');
           cell.className = 'bit-cell';
           cell.dataset.index = bitIndex;
+          cell.tabIndex = 0;
+          cell.role = 'button';
 
           const label = document.createElement('div');
           label.className = 'bit-index';
@@ -206,6 +219,12 @@ class RegisterViewer {
           cell.appendChild(label);
           cell.appendChild(square);
           cell.addEventListener('click', (event) => this.onBitClick(bitIndex, event));
+          cell.addEventListener('keydown', (event) => {
+            if (event.key === ' ' || event.key === 'Enter') {
+              event.preventDefault();
+              this.onBitClick(bitIndex, event);
+            }
+          });
           groupEl.appendChild(cell);
         }
 
@@ -225,6 +244,8 @@ class RegisterViewer {
       return;
     }
     this.renderGrid();
+    this.clearSelection();
+    this.updateSubPanel();
   }
 }
 
