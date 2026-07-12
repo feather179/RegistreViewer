@@ -335,8 +335,10 @@ class RegisterViewer {
 
   onInput() {
     if (this._formatting) return;
+    const raw = this.inputEl.value;
+    const isHex = /^0x/i.test(raw.trim());
     try {
-      this.value = this.parseValue(this.inputEl.value);
+      this.value = this.parseValue(raw);
       this.setStatus('', false);
     } catch (e) {
       this.setStatus('Invalid input');
@@ -345,9 +347,11 @@ class RegisterViewer {
     this.renderGrid();
     this.clearSelection();
     this.updateSubPanel();
-    this._formatting = true;
-    this.syncInput();
-    this._formatting = false;
+    if (isHex) {
+      this._formatting = true;
+      this.syncInput();
+      this._formatting = false;
+    }
   }
 }
 
