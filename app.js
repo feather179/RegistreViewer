@@ -8,6 +8,8 @@ class RegisterViewer {
     this._dragMoved = false;
     this._lastClickTime = 0;
     this._lastClickIndex = -1;
+    this._formatting = false;
+    this._subFormatting = false;
     this.init();
   }
 
@@ -62,18 +64,21 @@ class RegisterViewer {
     // Don't update lastAnchor on shift-click — keep it at the original anchor
   }
 
-  syncInput() {
-    let hex = this.value.toString(16).toUpperCase();
+  formatHex32(val) {
+    let hex = val.toString(16).toUpperCase();
     if (hex.length > 8) {
       hex = hex.padStart(Math.ceil(hex.length / 8) * 8, '0');
       const groups = [];
       for (let i = 0; i < hex.length; i += 8) {
         groups.push(hex.slice(i, i + 8));
       }
-      this.inputEl.value = '0x' + groups.join(' ');
-    } else {
-      this.inputEl.value = '0x' + hex;
+      return '0x' + groups.join(' ');
     }
+    return '0x' + hex;
+  }
+
+  syncInput() {
+    this.inputEl.value = this.formatHex32(this.value);
   }
 
   onBitMouseDown(index, event) {
@@ -189,7 +194,7 @@ class RegisterViewer {
     const subValue = this.extractSubValue();
 
     // Display
-    this.subHex.textContent = `Hex: 0x${subValue.toString(16).toUpperCase()}`;
+    this.subHex.textContent = 'Hex: ' + this.formatHex32(subValue);
     this.subDec.textContent = `Dec: ${subValue.toString(10)}`;
     let bin = subValue.toString(2);
     if (bin.length > 8) {
@@ -202,7 +207,7 @@ class RegisterViewer {
     } else {
       this.subBin.textContent = 'Bin: ' + bin;
     }
-    this.subInput.value = '0x' + subValue.toString(16).toUpperCase();
+    this.subInput.value = this.formatHex32(subValue);
   }
 
   extractSubValue() {
@@ -235,13 +240,14 @@ class RegisterViewer {
 
   onSubInput() {
     if (this.selectedBits.size === 0) return;
+    if (this._subFormatting) return;
 
     try {
       const newVal = this.parseValue(this.subInput.value);
 
       const maxVal = (1n << BigInt(this.selectedBits.size)) - 1n;
       if (newVal > maxVal) {
-        this.setStatus(`Value too large — max ${this.selectedBits.size} bits (0x${maxVal.toString(16).toUpperCase()})`);
+        this.setStatus(`Value too large — max ${this.selectedBits.size} bits (${this.formatHex32(maxVal)})`);
         this.renderGrid();
         this.updateSubPanel();
         return;
@@ -250,7 +256,9 @@ class RegisterViewer {
       this.writeSubValue(newVal);
       this.syncInput();
       this.renderGrid();
+      this._subFormatting = true;
       this.updateSubPanel();
+      this._subFormatting = false;
       this.setStatus('', false);
     } catch (e) {
       // Silently ignore — intermediate typing states are expected
@@ -326,6 +334,7 @@ class RegisterViewer {
   }
 
   onInput() {
+    if (this._formatting) return;
     try {
       this.value = this.parseValue(this.inputEl.value);
       this.setStatus('', false);
@@ -336,6 +345,9 @@ class RegisterViewer {
     this.renderGrid();
     this.clearSelection();
     this.updateSubPanel();
+    this._formatting = true;
+    this.syncInput();
+    this._formatting = false;
   }
 }
 
