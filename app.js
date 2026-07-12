@@ -80,11 +80,51 @@ class RegisterViewer {
   }
 
   updateSubPanel() {
-    // Will be implemented in Task 4
+    if (this.selectedBits.size === 0) {
+      this.subPanel.classList.add('hidden');
+      return;
+    }
+    this.subPanel.classList.remove('hidden');
+
+    // Build sorted list of selected positions
+    const sorted = [...this.selectedBits].sort((a, b) => b - a); // MSB first for display
+
+    // Display positions
+    if (this.selectedBits.size === 1) {
+      this.subPositions.textContent = `Bit ${sorted[0]}`;
+    } else {
+      const sortedAsc = [...this.selectedBits].sort((a, b) => a - b);
+      const isContiguous = sortedAsc[sortedAsc.length - 1] - sortedAsc[0] + 1 === sortedAsc.length;
+      if (isContiguous) {
+        this.subPositions.textContent = `Bits ${sortedAsc[0]}-${sortedAsc[sortedAsc.length - 1]} (${sortedAsc.length} bits)`;
+      } else {
+        this.subPositions.textContent = `Selected: ${sortedAsc.join(', ')} (${sortedAsc.length} bits, non-contiguous)`;
+      }
+    }
+
+    // Extract sub-value
+    const subValue = this.extractSubValue();
+
+    // Display
+    this.subHex.textContent = `Hex: 0x${subValue.toString(16).toUpperCase()}`;
+    this.subDec.textContent = `Dec: ${subValue.toString(10)}`;
+    this.subInput.value = '0x' + subValue.toString(16).toUpperCase();
+  }
+
+  extractSubValue() {
+    let result = 0n;
+    const sorted = [...this.selectedBits].sort((a, b) => a - b);
+    for (let i = 0; i < sorted.length; i++) {
+      const bitValue = (this.value >> BigInt(sorted[i])) & 1n;
+      if (bitValue) {
+        result |= (1n << BigInt(i));
+      }
+    }
+    return result;
   }
 
   onSubInput() {
-    // Will be implemented in Task 4
+    // Will be implemented in Task 6
   }
 
   setStatus(msg, isError = true) {
