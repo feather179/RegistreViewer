@@ -2,6 +2,8 @@
 
 A web-based tool for visualizing and editing 64-bit registers. Enter a value in hex (`0x...`), binary (`0b...`), or decimal, and interact with individual bits through the visual grid.
 
+Visit https://feather179.github.io/RegistreViewer/ to try online.
+
 ![alt text](res/screenshot.png)
 
 ## Features
