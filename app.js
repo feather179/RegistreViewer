@@ -123,8 +123,35 @@ class RegisterViewer {
     return result;
   }
 
+  writeSubValue(newVal) {
+    const sorted = [...this.selectedBits].sort((a, b) => a - b);
+
+    for (const pos of sorted) {
+      const mask = ~(1n << BigInt(pos));
+      this.value &= mask;
+    }
+
+    for (let i = 0; i < sorted.length; i++) {
+      const bitVal = (newVal >> BigInt(i)) & 1n;
+      if (bitVal) {
+        this.value |= (1n << BigInt(sorted[i]));
+      }
+    }
+  }
+
   onSubInput() {
-    // Will be implemented in Task 6
+    if (this.selectedBits.size === 0) return;
+
+    try {
+      const newVal = this.parseValue(this.subInput.value);
+      this.writeSubValue(newVal);
+      this.syncInput();
+      this.renderGrid();
+      this.updateSubPanel();
+      this.setStatus('', false);
+    } catch (e) {
+      this.setStatus('Invalid sub-value');
+    }
   }
 
   setStatus(msg, isError = true) {
