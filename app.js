@@ -5,6 +5,9 @@ class RegisterViewer {
     this.lastAnchor = null;
     this._dragAnchor = null;
     this._cellDragActive = false;
+    this._dragMoved = false;
+    this._lastClickTime = 0;
+    this._lastClickIndex = -1;
     this.init();
   }
 
@@ -63,7 +66,6 @@ class RegisterViewer {
   }
 
   onBitMouseDown(index, event) {
-    event.preventDefault();
     if (event.ctrlKey || event.metaKey) {
       this.toggleBit(index);
       this.syncInput();
@@ -80,6 +82,7 @@ class RegisterViewer {
 
     this._dragAnchor = index;
     this._cellDragActive = true;
+    this._dragMoved = false;
     this.lastAnchor = index;
     this.selectedBits.clear();
     this.selectedBits.add(index);
@@ -89,6 +92,7 @@ class RegisterViewer {
 
   onBitMouseEnter(index) {
     if (!this._cellDragActive) return;
+    this._dragMoved = true;
     const start = Math.min(this._dragAnchor, index);
     const end = Math.max(this._dragAnchor, index);
     this.selectedBits.clear();
@@ -100,10 +104,25 @@ class RegisterViewer {
   }
 
   onGlobalMouseUp() {
-    if (this._cellDragActive) {
-      this._cellDragActive = false;
-      this._dragAnchor = null;
+    if (!this._cellDragActive) return;
+    this._cellDragActive = false;
+    if (!this._dragMoved) {
+      const now = Date.now();
+      const idx = this._dragAnchor;
+      if (now - this._lastClickTime < 350 && this._lastClickIndex === idx) {
+        this.toggleBit(idx);
+        this.syncInput();
+        this.renderGrid();
+        this.updateSubPanel();
+        this._lastClickTime = 0;
+        this._lastClickIndex = -1;
+        this._dragAnchor = null;
+        return;
+      }
+      this._lastClickTime = now;
+      this._lastClickIndex = idx;
     }
+    this._dragAnchor = null;
   }
 
   onBitKeyDown(index, event) {
@@ -257,12 +276,6 @@ class RegisterViewer {
           cell.appendChild(square);
           cell.addEventListener('mousedown', (event) => this.onBitMouseDown(bitIndex, event));
           cell.addEventListener('mouseenter', () => this.onBitMouseEnter(bitIndex));
-          cell.addEventListener('dblclick', (event) => {
-            this.toggleBit(bitIndex);
-            this.syncInput();
-            this.renderGrid();
-            this.updateSubPanel();
-          });
           cell.addEventListener('keydown', (event) => this.onBitKeyDown(bitIndex, event));
           groupEl.appendChild(cell);
         }

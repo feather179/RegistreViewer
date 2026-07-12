@@ -51,6 +51,7 @@ h1 {
   flex-direction: column;
   gap: 12px;
   margin-bottom: 1.5rem;
+  user-select: none;
 }
 
 .bit-row {
