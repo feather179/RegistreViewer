@@ -20,6 +20,56 @@ class RegisterViewer {
     this.subInput.addEventListener('input', () => this.onSubInput());
   }
 
+  toggleBit(index) {
+    const mask = 1n << BigInt(index);
+    this.value ^= mask;
+  }
+
+  clearSelection() {
+    this.selectedBits.clear();
+  }
+
+  toggleSelection(index) {
+    // Will be implemented in Task 4
+  }
+
+  selectRange(index) {
+    // Will be implemented in Task 4
+  }
+
+  syncInput() {
+    this.inputEl.value = '0x' + this.value.toString(16).toUpperCase();
+  }
+
+  onBitClick(index, event) {
+    if (event.ctrlKey || event.metaKey) {
+      this.toggleSelection(index);
+      this.renderGrid();
+      this.updateSubPanel();
+      return;
+    }
+    if (event.shiftKey) {
+      this.selectRange(index);
+      this.renderGrid();
+      this.updateSubPanel();
+      return;
+    }
+
+    this.toggleBit(index);
+    this.clearSelection();
+    this.syncInput();
+    this.renderGrid();
+    this.updateSubPanel();
+  }
+
+  updateSubPanel() {
+    // Will be implemented in Task 4
+  }
+
+  onSubInput() {
+    // Will be implemented in Task 4
+  }
+
   setStatus(msg, isError = true) {
     this.statusBar.textContent = msg;
     this.statusBar.style.color = isError ? '#f55' : '#7cff7c';
@@ -67,6 +117,7 @@ class RegisterViewer {
 
           cell.appendChild(label);
           cell.appendChild(square);
+          cell.addEventListener('click', (event) => this.onBitClick(bitIndex, event));
           groupEl.appendChild(cell);
         }
 
