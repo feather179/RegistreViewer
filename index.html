@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>64-bit Register Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>64-bit Register Viewer</h1>
+
+    <div class="input-section">
+      <label for="value-input">Value:</label>
+      <input type="text" id="value-input" placeholder="0x... / 0b... / decimal" autofocus>
+    </div>
+
+    <div id="bit-grid"></div>
+
+    <div id="sub-panel" class="hidden">
+      <h3>Selected Bits</h3>
+      <div class="sub-info">
+        <span id="sub-positions"></span>
+      </div>
+      <div class="sub-input">
+        <label for="sub-value">Value:</label>
+        <input type="text" id="sub-value" placeholder="edit selected bits">
+      </div>
+      <div class="sub-display">
+        <span id="sub-hex">Hex: 0x0</span>
+        <span id="sub-dec">Dec: 0</span>
+      </div>
+    </div>
+
+    <div id="status-bar"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

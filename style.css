@@ -1,0 +1,154 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+#app {
+  max-width: 900px;
+  width: 100%;
+}
+
+h1 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: #ccc;
+}
+
+.input-section {
+  margin-bottom: 1.5rem;
+}
+
+#value-input {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1.2rem;
+  font-family: 'Courier New', monospace;
+  background: #16213e;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  border-radius: 4px;
+  outline: none;
+}
+
+#value-input:focus {
+  border-color: #7cff7c;
+}
+
+/* --- Bit Grid --- */
+
+#bit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.bit-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.byte-group {
+  display: flex;
+  gap: 2px;
+}
+
+.bit-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.bit-index {
+  font-size: 0.55rem;
+  color: #666;
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.bit-square {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background: #444;
+  transition: background 0.1s;
+}
+
+.bit-square[data-value="1"] {
+  background: #7cff7c;
+}
+
+.bit-square.selected {
+  outline: 2px solid #4a9eff;
+  outline-offset: -2px;
+}
+
+/* --- Sub-value Panel --- */
+
+#sub-panel {
+  background: #16213e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+#sub-panel.hidden {
+  display: none;
+}
+
+.sub-info {
+  margin-bottom: 0.5rem;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.sub-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#sub-value {
+  flex: 1;
+  padding: 0.4rem;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  border-radius: 4px;
+  outline: none;
+}
+
+#sub-value:focus {
+  border-color: #4a9eff;
+}
+
+.sub-display {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* --- Status Bar --- */
+
+#status-bar {
+  color: #f55;
+  font-size: 0.8rem;
+  min-height: 1rem;
+}
