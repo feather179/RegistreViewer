@@ -19,6 +19,7 @@ class RegisterViewer {
     this.subInput = document.getElementById('sub-value');
     this.subHex = document.getElementById('sub-hex');
     this.subDec = document.getElementById('sub-dec');
+    this.subBin = document.getElementById('sub-bin');
     this.statusBar = document.getElementById('status-bar');
 
     this.inputEl.addEventListener('input', () => this.onInput());
@@ -62,7 +63,17 @@ class RegisterViewer {
   }
 
   syncInput() {
-    this.inputEl.value = '0x' + this.value.toString(16).toUpperCase();
+    let hex = this.value.toString(16).toUpperCase();
+    if (hex.length > 8) {
+      hex = hex.padStart(Math.ceil(hex.length / 8) * 8, '0');
+      const groups = [];
+      for (let i = 0; i < hex.length; i += 8) {
+        groups.push(hex.slice(i, i + 8));
+      }
+      this.inputEl.value = '0x' + groups.join(' ');
+    } else {
+      this.inputEl.value = '0x' + hex;
+    }
   }
 
   onBitMouseDown(index, event) {
@@ -180,6 +191,17 @@ class RegisterViewer {
     // Display
     this.subHex.textContent = `Hex: 0x${subValue.toString(16).toUpperCase()}`;
     this.subDec.textContent = `Dec: ${subValue.toString(10)}`;
+    let bin = subValue.toString(2);
+    if (bin.length > 8) {
+      bin = bin.padStart(Math.ceil(bin.length / 8) * 8, '0');
+      const groups = [];
+      for (let i = 0; i < bin.length; i += 8) {
+        groups.push(bin.slice(i, i + 8));
+      }
+      this.subBin.textContent = 'Bin: ' + groups.join(' ');
+    } else {
+      this.subBin.textContent = 'Bin: ' + bin;
+    }
     this.subInput.value = '0x' + subValue.toString(16).toUpperCase();
   }
 
@@ -241,7 +263,7 @@ class RegisterViewer {
   }
 
   parseValue(str) {
-    str = str.trim();
+    str = str.trim().replace(/\s+/g, '');
     if (!str) return 0n;
     let val;
     if (str.startsWith('0x') || str.startsWith('0X')) {
