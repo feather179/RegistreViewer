@@ -203,9 +203,9 @@ class RegisterViewer {
       for (let i = 0; i < bin.length; i += 8) {
         groups.push(bin.slice(i, i + 8));
       }
-      this.subBin.textContent = 'Bin: ' + groups.join(' ');
+      this.subBin.textContent = 'Bin: 0b' + groups.join(' ');
     } else {
-      this.subBin.textContent = 'Bin: ' + bin;
+      this.subBin.textContent = 'Bin: 0b' + bin;
     }
     this.subInput.value = this.formatHex32(subValue);
   }

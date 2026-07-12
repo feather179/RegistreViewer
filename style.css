@@ -142,9 +142,11 @@ h1 {
 
 .sub-display {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.2rem;
   font-size: 0.85rem;
   color: #aaa;
+  font-family: 'Courier New', monospace;
 }
 
 /* --- Status Bar --- */
