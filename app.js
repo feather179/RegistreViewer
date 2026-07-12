@@ -18,6 +18,7 @@ class RegisterViewer {
 
     this.inputEl.addEventListener('input', () => this.onInput());
     this.subInput.addEventListener('input', () => this.onSubInput());
+    this.renderGrid();
   }
 
   toggleBit(index) {
