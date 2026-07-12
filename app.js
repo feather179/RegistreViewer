@@ -27,14 +27,31 @@ class RegisterViewer {
 
   clearSelection() {
     this.selectedBits.clear();
+    this.lastAnchor = null;
   }
 
   toggleSelection(index) {
-    // Will be implemented in Task 4
+    if (this.selectedBits.has(index)) {
+      this.selectedBits.delete(index);
+    } else {
+      this.selectedBits.add(index);
+    }
+    this.lastAnchor = index;
   }
 
   selectRange(index) {
-    // Will be implemented in Task 4
+    if (this.lastAnchor === null) {
+      this.selectedBits.add(index);
+      this.lastAnchor = index;
+      return;
+    }
+    const start = Math.min(this.lastAnchor, index);
+    const end = Math.max(this.lastAnchor, index);
+    this.selectedBits.clear();
+    for (let i = start; i <= end; i++) {
+      this.selectedBits.add(i);
+    }
+    // Don't update lastAnchor on shift-click — keep it at the original anchor
   }
 
   syncInput() {
@@ -114,6 +131,9 @@ class RegisterViewer {
           const square = document.createElement('div');
           square.className = 'bit-square';
           square.dataset.value = bitValue.toString();
+          if (this.selectedBits.has(bitIndex)) {
+            square.classList.add('selected');
+          }
 
           cell.appendChild(label);
           cell.appendChild(square);
