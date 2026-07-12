@@ -61,7 +61,8 @@ class RegisterViewer {
 
   onBitClick(index, event) {
     if (event.ctrlKey || event.metaKey) {
-      this.toggleSelection(index);
+      this.toggleBit(index);
+      this.syncInput();
       this.renderGrid();
       this.updateSubPanel();
       return;
@@ -73,9 +74,9 @@ class RegisterViewer {
       return;
     }
 
-    this.toggleBit(index);
-    this.clearSelection();
-    this.syncInput();
+    this.selectedBits.clear();
+    this.selectedBits.add(index);
+    this.lastAnchor = index;
     this.renderGrid();
     this.updateSubPanel();
   }
