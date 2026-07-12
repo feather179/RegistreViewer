@@ -69,13 +69,14 @@ class RegisterViewer {
     if (event.ctrlKey || event.metaKey) {
       this.toggleBit(index);
       this.syncInput();
-      this.renderGrid();
+      this.updateBitValueUI(index);
+      this.updateSelectionUI();
       this.updateSubPanel();
       return;
     }
     if (event.shiftKey) {
       this.selectRange(index);
-      this.renderGrid();
+      this.updateSelectionUI();
       this.updateSubPanel();
       return;
     }
@@ -86,7 +87,7 @@ class RegisterViewer {
     this.lastAnchor = index;
     this.selectedBits.clear();
     this.selectedBits.add(index);
-    this.renderGrid();
+    this.updateSelectionUI();
     this.updateSubPanel();
   }
 
@@ -99,30 +100,29 @@ class RegisterViewer {
     for (let i = start; i <= end; i++) {
       this.selectedBits.add(i);
     }
-    this.renderGrid();
+    this.updateSelectionUI();
     this.updateSubPanel();
   }
 
   onGlobalMouseUp() {
-    if (!this._cellDragActive) return;
     this._cellDragActive = false;
-    if (!this._dragMoved) {
-      const now = Date.now();
-      const idx = this._dragAnchor;
-      if (now - this._lastClickTime < 350 && this._lastClickIndex === idx) {
-        this.toggleBit(idx);
-        this.syncInput();
-        this.renderGrid();
-        this.updateSubPanel();
-        this._lastClickTime = 0;
-        this._lastClickIndex = -1;
-        this._dragAnchor = null;
-        return;
-      }
-      this._lastClickTime = now;
-      this._lastClickIndex = idx;
+  }
+
+  onBitClick(index) {
+    if (this._dragMoved) return;
+    const now = Date.now();
+    if (now - this._lastClickTime < 350 && this._lastClickIndex === index) {
+      this.toggleBit(index);
+      this.syncInput();
+      this.updateBitValueUI(index);
+      this.updateSelectionUI();
+      this.updateSubPanel();
+      this._lastClickTime = 0;
+      this._lastClickIndex = -1;
+      return;
     }
-    this._dragAnchor = null;
+    this._lastClickTime = now;
+    this._lastClickIndex = index;
   }
 
   onBitKeyDown(index, event) {
@@ -134,6 +134,21 @@ class RegisterViewer {
       this.renderGrid();
       this.updateSubPanel();
     }
+  }
+
+  updateBitValueUI(index) {
+    const sq = this.gridEl.querySelector(`[data-index="${index}"] .bit-square`);
+    if (!sq) return;
+    const bitVal = (this.value >> BigInt(index)) & 1n;
+    sq.dataset.value = bitVal.toString();
+  }
+
+  updateSelectionUI() {
+    this.gridEl.querySelectorAll('.bit-square').forEach(sq => {
+      const cell = sq.closest('.bit-cell');
+      const idx = parseInt(cell.dataset.index);
+      sq.classList.toggle('selected', this.selectedBits.has(idx));
+    });
   }
 
   updateSubPanel() {
@@ -276,6 +291,7 @@ class RegisterViewer {
           cell.appendChild(square);
           cell.addEventListener('mousedown', (event) => this.onBitMouseDown(bitIndex, event));
           cell.addEventListener('mouseenter', () => this.onBitMouseEnter(bitIndex));
+          cell.addEventListener('click', () => this.onBitClick(bitIndex));
           cell.addEventListener('keydown', (event) => this.onBitKeyDown(bitIndex, event));
           groupEl.appendChild(cell);
         }
