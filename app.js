@@ -3,6 +3,8 @@ class RegisterViewer {
     this.value = 0n;
     this.selectedBits = new Set();
     this.lastAnchor = null;
+    this._dragAnchor = null;
+    this._cellDragActive = false;
     this.init();
   }
 
@@ -18,6 +20,7 @@ class RegisterViewer {
 
     this.inputEl.addEventListener('input', () => this.onInput());
     this.subInput.addEventListener('input', () => this.onSubInput());
+    document.addEventListener('mouseup', () => this.onGlobalMouseUp());
     this.renderGrid();
   }
 
@@ -59,7 +62,8 @@ class RegisterViewer {
     this.inputEl.value = '0x' + this.value.toString(16).toUpperCase();
   }
 
-  onBitClick(index, event) {
+  onBitMouseDown(index, event) {
+    event.preventDefault();
     if (event.ctrlKey || event.metaKey) {
       this.toggleBit(index);
       this.syncInput();
@@ -74,11 +78,43 @@ class RegisterViewer {
       return;
     }
 
+    this._dragAnchor = index;
+    this._cellDragActive = true;
+    this.lastAnchor = index;
     this.selectedBits.clear();
     this.selectedBits.add(index);
-    this.lastAnchor = index;
     this.renderGrid();
     this.updateSubPanel();
+  }
+
+  onBitMouseEnter(index) {
+    if (!this._cellDragActive) return;
+    const start = Math.min(this._dragAnchor, index);
+    const end = Math.max(this._dragAnchor, index);
+    this.selectedBits.clear();
+    for (let i = start; i <= end; i++) {
+      this.selectedBits.add(i);
+    }
+    this.renderGrid();
+    this.updateSubPanel();
+  }
+
+  onGlobalMouseUp() {
+    if (this._cellDragActive) {
+      this._cellDragActive = false;
+      this._dragAnchor = null;
+    }
+  }
+
+  onBitKeyDown(index, event) {
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      this.selectedBits.clear();
+      this.selectedBits.add(index);
+      this.lastAnchor = index;
+      this.renderGrid();
+      this.updateSubPanel();
+    }
   }
 
   updateSubPanel() {
@@ -219,13 +255,9 @@ class RegisterViewer {
 
           cell.appendChild(label);
           cell.appendChild(square);
-          cell.addEventListener('click', (event) => this.onBitClick(bitIndex, event));
-          cell.addEventListener('keydown', (event) => {
-            if (event.key === ' ' || event.key === 'Enter') {
-              event.preventDefault();
-              this.onBitClick(bitIndex, event);
-            }
-          });
+          cell.addEventListener('mousedown', (event) => this.onBitMouseDown(bitIndex, event));
+          cell.addEventListener('mouseenter', () => this.onBitMouseEnter(bitIndex));
+          cell.addEventListener('keydown', (event) => this.onBitKeyDown(bitIndex, event));
           groupEl.appendChild(cell);
         }
 
